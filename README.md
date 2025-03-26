@@ -2,7 +2,7 @@
 
 ---
 
-### **Ticket #1 (Mobile P.1): Build Login UI and Prepare JWT Handling (SwiftUI)**  
+### **Ticket #102 (Mobile P.1): Build Login UI and Prepare JWT Handling (SwiftUI)**  
 **Due Date:** 04/11/2025 at 11:59 PM (EST)  
 **SWEs:** Steven Lin, Alyssa Hsu
 
