@@ -78,11 +78,10 @@ final class AuthService {
         }
     }
 
-    extension AuthService {
-    func refreshToken() async throws {
-        // TODO: Implement token refresh using refresh token
-        // Example call: /api/auth/refresh with stored refresh token
-        throw NSError(domain: "RefreshNotImplemented", code: -1)
+    // extension AuthService {
+    // func refreshToken() async throws {
+    //     // TODO: Implement token refresh using refresh token
+    //     // Example call: /api/auth/refresh with stored refresh token
+    //     throw NSError(domain: "RefreshNotImplemented", code: -1)
     }
-}
-}
+
