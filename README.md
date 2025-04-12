@@ -1,101 +1,109 @@
 # BRL-Mobile-App
 
 ---
+Ticket #104 (Mobile P.2): Implement “Connect a Bank” UI and OAuth Flow Initiation (SwiftUI)
+Due Date: 04/11/2025 at 11:59 PM (EST)
+SWEs: Steven Lin, Alyssa Hsu
 
-### **Ticket #102 (Mobile P.1): Build Login UI and Prepare JWT Handling (SwiftUI)**  
-**Due Date:** 04/11/2025 at 11:59 PM (EST)  
-**SWEs:** Steven Lin, Alyssa Hsu
+Task: Implement “Connect a Bank” UI and OAuth Flow Initiation (SwiftUI)
+Now that login is functional, users should be able to view a list of available banks and initiate an OAuth linking flow (e.g., with Capital One). This ticket focuses on building the “Connect a Bank” screen and integrating the front-end redirect logic to the backend's /api/oauth/initiate?bank=c1 endpoint.
 
----
+Key Goals
+Design a SwiftUI screen titled “Connect Your Bank”
 
-### **Task: Build Login UI and Prepare JWT Handling (SwiftUI)**  
-This ticket establishes the core login interface and logic for the Big Red Link iOS mobile app using SwiftUI. While the backend authentication API (`/api/auth/login`) may not be finalized by the due date, the mobile app will still complete all frontend components and **mock the backend response** in preparation for integration.
+Display a list of available bank options (start with Capital One)
 
-This foundation will support authentication and secure communication with the backend in all future mobile features, including bank linking and user dashboards.
+When a user taps a bank, send a request to BRL backend to begin OAuth flow
 
----
+Handle the redirect to the external OAuth provider (e.g., Capital One login page)
 
-### **Key Goals**
-- Build a SwiftUI login screen with email and password fields
-- Prepare the login request using `URLSession`
-- Simulate backend response using a mock or local JSON
-- Store the access token securely using Keychain
-- Set up the structure for authenticated API requests
-- Ensure easy switch-over to live backend when available
+Prepare UI for success/failure redirection handling
 
----
+Steps to Complete
+1. Create “Connect a Bank” UI
 
-### **Steps to Complete**
+Create a new SwiftUI view: BankLinkView
 
-**1. Create Login UI (SwiftUI)**
-- Implement a `LoginView` with:
-  - `TextField` for email
-  - `SecureField` for password
-  - `Button` to initiate login
-- Provide inline error messaging or alerts on validation
+Add:
 
-**2. Create Login Request Logic**
-- Write a network service (`AuthService.swift`) to handle:
-  - POST request to `/api/auth/login`
-  - JSON body: `{ "email": "...", "password": "..." }`
-- For now, use:
-  - A local mock JSON file, or
-  - A mock server such as [Postman Mock Server](https://www.postman.com/mock-api/), to simulate:
-    ```json
-    { "access_token": "mocked.jwt.token" }
-    ```
+A title (“Link Your Bank”)
 
-**3. Store Access Token Securely**
-- Use iOS Keychain to store the `access_token`
-  - Implement helper in `TokenManager.swift`
-  - Use either native `Keychain Services` or a wrapper like `KeychainAccess`
-- Confirm stored token is retrievable and used in:
-  ```http
-  Authorization: Bearer <access_token>
-  ```
+A list or buttons for bank options (e.g., Capital One)
 
-**4. Prepare for Token Expiration**
-- Parse the JWT payload (using `JWTDecode.swift`) to extract expiration if needed
-- Add a placeholder `refreshToken()` function to be implemented in a future ticket
+For now, hardcode Capital One with an associated value like bank=c1
 
-**5. Error Handling & Validation**
-- Handle:
-  - Empty or invalid form fields
-  - Simulated “invalid credentials” errors from the mock server
-- Provide user feedback using `Alert`, `Text`, or `Toast`
+2. Connect to OAuth Flow
 
----
+On selection (e.g., user taps Capital One):
 
-### **Preparation for Next Subteam Meeting**
-- Be ready to demo:
-  - Working SwiftUI login screen
-  - Simulated login success and error handling
-  - Secure token stored in Keychain
-  - Token attached to a test API request
-- Confirm compatibility with backend team’s `/api/auth/login` response
+Send a GET request to:
 
----
+bash
+Copy
+Edit
+/api/oauth/initiate?bank=c1
+with JWT Authorization header
 
-### **Notes & Considerations**
-- All API requests must use HTTPS (even for mock servers)
-- Do not log sensitive information (tokens, passwords)
-- Keychain storage should be used instead of `UserDefaults`
-- This ticket does not implement token refresh or logout — those will follow
+Parse the redirect URL from the response or handle a 302 redirect
 
----
+Open the OAuth provider’s URL using:
 
-### **Dependencies**
-- This ticket assumes `/api/auth/login` will be implemented by the backend team by 04/11.
-- If not available by the demo date, continue testing with mocks.
-- Mobile and backend teams should align on:
-  - Request/response structure
-  - HTTP status codes
-  - Token format and naming
+swift
+Copy
+Edit
+UIApplication.shared.open(URL)
+3. Handle Redirect Return
 
----
+Implement a placeholder OAuthReturnView to handle the return from /api/oauth/callback
 
-### **Resources**
-- Apple Keychain Services: [https://developer.apple.com/documentation/security/keychain_services](https://developer.apple.com/documentation/security/keychain_services)  
-- JWTDecode.swift (JWT parsing): [https://github.com/auth0/JWTDecode.swift](https://github.com/auth0/JWTDecode.swift)  
-- Swift HTTP Networking (URLSession): [https://developer.apple.com/documentation/foundation/urlsession](https://developer.apple.com/documentation/foundation/urlsession)  
-- Mock Server: [Postman Mock Servers](https://www.postman.com/mock-api/)
+This view will be triggered when the app is reopened with a deep link (e.g., brl://oauth-callback)
+
+Add comments or prepare for future integration with backend storage and encryption
+
+4. Error Handling
+
+Display alerts for:
+
+Failure to load OAuth URL
+
+Unauthorized (expired token)
+
+Network issues
+
+Provide “Try again” or “Back to Dashboard” navigation options
+
+Preparation for Next Subteam Meeting
+Be ready to demo:
+
+Full flow from login to “Connect a Bank” screen
+
+Redirect opening Capital One’s sandbox OAuth login page
+
+Returning to the app from the OAuth provider (even if unprocessed)
+
+Coordinate with backend team to test /api/oauth/initiate behavior and redirect URL correctness
+
+Notes & Considerations
+Backend must validate JWT and return/redirect to the correct OAuth page
+
+Final storage and encryption of OAuth tokens will happen in a later ticket (Backend #105)
+
+Handle iOS deep link registration in Info.plist for brl:// scheme
+
+Prepare state restoration in case of app termination during OAuth
+
+Dependencies
+Requires that user is logged in (JWT must be available in memory or retrieved from Keychain)
+
+Assumes /api/oauth/initiate is available and working (Backend Ticket #103)
+
+Requires iOS setup for handling external redirects back into the app (e.g., Universal Links or Custom URL Schemes)
+
+Resources
+SwiftUI Navigation: Apple SwiftUI Navigation Docs
+
+Open External URL: UIApplication.shared.open
+
+Deep Linking in iOS: RayWenderlich Guide
+
+OAuth Best Practices: RFC 8252 - OAuth 2.0 for Native Apps
